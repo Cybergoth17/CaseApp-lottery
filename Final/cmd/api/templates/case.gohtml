@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+    }
+
+    .cardList {
+        height: 100px;
+        width: 300px;
+        position: relative;
+        margin: 10px;
+        border: 1px solid #33e;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .card {
+        display: inline-block;
+        text-align: center;
+        height: 100px;
+        width: 100px;
+        line-height: 100px;
+        background-color: #99e;
+        font-family: monospace;
+        font-size: 2em;
+        color: #444;
+
+    }
+
+    .cardList::before,
+    .cardList::after {
+        content: '';
+        display: block;
+        z-index: 100;
+        width: 0px;
+        height: 0px;
+        transform: translateX(-50%);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+    }
+
+    .cardList::before {
+        position: absolute;
+        top: 0px;
+        left: 50%;
+        border-top: 12px solid #33e;
+    }
+
+    .cardList::after {
+        position: absolute;
+        bottom: 0px;
+        left: 50%;
+        border-bottom: 12px solid #33e;
+    }
+
+    .common {
+        background-color: green;
+        width: 200px;
+    }
+    .rare {
+        background-color: lightblue;
+        width: 100px;
+    }
+    .mythical {
+        background-color: yellow;
+        width: 50px;
+    }
+    .legendary {
+        background-color: orange;
+        width: 20px;
+    }
+</style>
+<body>
+<table class="content-table">
+    <thead>
+    <tr>
+        <th>Rank</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range $i,$k :=.}}
+        <tr>
+            <td>{{$i}}</td>
+            <td>{{$k.ItemName}}</td>
+            <td>{{$k.ItemDescription}}</td>
+            <td>{{$k.Type}}</td>
+            <td>{{$k.Stars}}</td>
+        </tr>
+    {{end}}
+    </tbody>
+</table>
+
+<div class="cardList"><!--
+    --><div class="card common">Common</div><!--
+    --><div class="card rare">Rare</div><!--
+    --><div class="card mythical">M</div><!--
+    --><div class="card legendary">L</div><!--
+--></div>
+<button id="spin">Spin</button>
+<div id="winning-card-type"></div>
+</body>
+<script>
+    var cardList = document.querySelector('.cardList');
+    var cards = document.querySelectorAll('.card');
+    var speed = 10000;
+    var width = 100;
+    var randomize = true;
+    var distance = 20 * width;
+
+    for (var i = 0; i < 50; i++) {
+        var clone = cards[0].cloneNode(true);
+        var clone1 = cards[1].cloneNode(true);
+        var clone2 = cards[2].cloneNode(true);
+        var clone3 = cards[3].cloneNode(true);
+        cardList.appendChild(clone);
+        cardList.appendChild(clone1);
+        cardList.appendChild(clone2);
+        cardList.appendChild(clone3);
+    }
+
+    function spin() {
+        var newMargin = 0;
+        var newDistance = distance;
+        if (randomize) {
+            newDistance = Math.floor(Math.random() * cards.length * 5);
+            newDistance += cards.length * 10;
+            var rand = Math.floor((Math.random() * 100) + 1);
+            newDistance *= rand;
+        }
+        newMargin = -(newDistance);
+        console.log(newMargin)
+        findWinningCard(newMargin)
+        animate(cards[0], newMargin, speed);
+
+    }
+
+    function animate(element, newMargin, duration) {
+        var start = new Date().getTime();
+        var end = start + duration;
+        var current = parseInt(element.style.marginLeft) || 0;
+        var distance = Math.abs(parseInt(element.style.marginLeft) || 0) + Math.abs(parseInt(newMargin));
+        var step = Math.ceil(distance / (duration / 20));
+        var direction = (parseInt(newMargin) > current) ? 1 : -1;
+
+        function frame() {
+            current += step * direction;
+            element.style.marginLeft = current + 'px';
+            if ((direction > 0 && current < parseInt(newMargin)) || (direction < 0 && current > parseInt(newMargin))) {
+                requestAnimationFrame(frame);
+            }
+        }
+
+        requestAnimationFrame(frame);
+    }
+
+    document.getElementById('spin').addEventListener('click', function() {
+        setTimeout(spin, 500);
+        return false;
+    });
+
+    function findWinningCard(newMargin) {
+        var cardList = document.querySelector('.cardList');
+        var cards = document.querySelectorAll('.card');
+        var winningClass=null
+
+
+        var winningIndex = Math.floor(((Math.abs(newMargin)+150) / 370));
+        console.log(winningIndex)
+        if(winningIndex===0){
+            res=Math.abs(newMargin)+150
+        }
+        else if(winningIndex*370<370){
+        res=winningIndex
+        }else {
+            var res = Math.abs(newMargin) - winningIndex * 370;
+            res = res + 150
+        }
+        console.log(res)
+
+        if (res<=200){
+            winningClass="common";
+        }else if(res<=300){
+            winningClass="rare";
+        }else if(res<=350){
+            winningClass="mythical";
+        }else if(res<=370){
+            winningClass="legendary"
+        }
+
+        switch (winningClass) {
+            case "common":
+                console.log("You won a common card!");
+                break;
+            case "rare":
+                console.log("You won a rare card!");
+                break;
+            case "mythical":
+                console.log("You won a mythical card!");
+                break;
+            case "legendary":
+                console.log("You won a legendary card!");
+                break;
+            default:
+                console.log("Unknown card type");
+                break;
+        }
+    }
+
+
+
+</script>
+</html>

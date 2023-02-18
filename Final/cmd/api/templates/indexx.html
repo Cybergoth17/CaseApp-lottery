@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>main page</title>
+</head>
+<style>
+        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+section{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header .logo{
+    position: relative;
+    max-width: 80px;
+}
+header ul{
+    position: relative;
+    display: flex;
+}
+header ul li{
+    list-style: none;
+}
+header ul li a{
+    display: inline-block;
+    color: #333;
+    font-weight: 400;
+    margin-left: 40px;
+    text-decoration: none;
+}
+.content{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.5s;
+}
+.content .textBox{
+    position: relative;
+    max-width: 600px;
+}
+.content .textBox h2{
+ color: #333;
+ font-size: 4em;
+ line-height: 1.4em;
+ font-weight: 500;
+}.content .textBox p span{
+    color: #9c1d1d;
+    font-size: 1.2em;
+    font-weight: 900;
+}
+.content .textBox p{
+   color: #333;
+}
+.content .textBox a{
+   display: inline-block;
+   margin-top: 20px;
+   padding: 8px 20px;
+   background: #a04949;
+   color: #fff;
+   border-radius: 40px;
+   font-weight: 500;
+   letter-spacing: 1px;
+   text-decoration: none;
+}
+.content .imgBox{
+   width: 600px;
+   display: flex;
+   justify-content: flex-end;
+   padding-right: 50px;
+   margin-top: 50px;
+   transition: 0.5s;
+}
+.content .imgBox{
+   max-width: 340px;
+   transition: 0.5s;
+}
+.circle{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #a04949;
+    clip-path: circle(600px at right 800px);
+}
+</style>
+    <body>
+        <section>
+            <div class="circle"></div>
+            <header>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Shop</a></li>
+                    <li><a href="#" style="color: #9c1d1d;">Login</a></li>
+                    <li><a href="#" style="color: #9c1d1d;">Register</a></li>
+                </ul>
+            </header>
+            <div class="content">
+                <div class="textBox">
+                    <p style="font-size: 40px;font-weight: 500;"> Promote your account in <span class="colortext">Genshin Impact</span> with us .</p>
+                    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit velit mollitia veritatis perferendis. Iure, iusto quos? Fugit nostrum veniam repellendus quis? Quia omnis vero, eaque sint molestiae unde dolorum fugiat!</p>
+                    <a href="#" class="button">Learn more</a>
+                </div>
+                <div class="ImgBox">
+                    <img src="cmd/klee.png" style="width:280px" class="starbucks">
+                </div>
+            </div>
+        </section>
+</body>
+</html>

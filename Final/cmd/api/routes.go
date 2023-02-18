@@ -1,21 +1,22 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
 func (app *application) routes() http.Handler {
 
-	router := httprouter.New()
-
-	router.NotFound = http.HandlerFunc(app.notFoundResponse)
-	router.MethodNotAllowed = http.HandlerFunc(app.methodNotAllowedResponse)
-	router.HandlerFunc(http.MethodGet, "/api/items", app.listCasesHandler)
-	router.HandlerFunc(http.MethodPost, "/api/items", app.createCaseItemsHandler)
-	router.HandlerFunc(http.MethodGet, "/api/items/:id", app.showItemsHandler)
-	router.HandlerFunc(http.MethodDelete, "/api/items/:id", app.deleteItemHandler)
-	router.HandlerFunc(http.MethodPut, "/api/items/:id", app.updateItemCaseHandler)
+	router := mux.NewRouter()
+	fs := http.FileServer(http.Dir("./cmd"))
+	router.PathPrefix("/cmd/").Handler(http.StripPrefix("/cmd/", fs))
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "cmd/api/templates/indexx.html")
+	}).Methods("GET", "OPTIONS")
+	router.HandleFunc("/reg", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "cmd/api/templates/reg.html")
+	}).Methods("GET", "OPTIONS")
+	router.HandleFunc("/case", app.casePageHandler).Methods("GET", "OPTIONS")
 	return app.recoverPanic(app.rateLimit(router))
 
 }
