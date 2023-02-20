@@ -4,55 +4,51 @@ import (
 	"Final/internal/data"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 )
 
-func (app *application) createCaseItemsHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) createCaseHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Error parsing form data", http.StatusBadRequest)
 		return
 	}
-	file, _, err := r.FormFile("image")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
+	casename := r.Form.Get("name")
+	stars := r.Form.Get("price")
+	item1 := r.Form.Get("items1")
+	item2 := r.Form.Get("items2")
+	item3 := r.Form.Get("items3")
+	item4 := r.Form.Get("items4")
+	item5 := r.Form.Get("items5")
+	caseitems := make([]data.CaseItems, 0)
+	x, _ := app.models.CaseItem.GetCaseItemByName(item1)
+	x1, _ := app.models.CaseItem.GetCaseItemByName(item2)
+	x2, _ := app.models.CaseItem.GetCaseItemByName(item3)
+	x3, _ := app.models.CaseItem.GetCaseItemByName(item4)
+	x4, _ := app.models.CaseItem.GetCaseItemByName(item5)
+	caseitems = append(caseitems, *x)
+	caseitems = append(caseitems, *x1)
+	caseitems = append(caseitems, *x2)
+	caseitems = append(caseitems, *x3)
+	caseitems = append(caseitems, *x4)
 
-	data1, err := ioutil.ReadAll(file)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	itemname := r.Form.Get("itemname")
-	itemdesc := r.Form.Get("itemdescription")
-	typee := r.Form.Get("type")
-	stars := r.Form.Get("stars")
-	num, err := strconv.ParseInt(stars, 10, 64)
+	price, err := strconv.ParseInt(stars, 10, 64)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	item := &data.CaseItems{
-		ItemName:        itemname,
-		ItemDescription: itemdesc,
-		Type:            typee,
-		Stars:           num,
-		Image:           data1,
+	item := &data.Case{
+		Name:  casename,
+		Price: price,
+		Items: caseitems,
 	}
-	// Initialize a new Validator.
 
-	err = app.models.CaseItem.InsertItem(item)
+	err = app.models.Case.InsertItem(item)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	// When sending an HTTP response, we want to include a Location header to let the
-	// client know which URL they can find the newly-created resource at. We make an
-	// empty http.Header map and then use the Set() method to add a new Location header,
-	// interpolating the system-generated ID for our new movie in the URL.
+
 	headers := make(http.Header)
 	headers.Set("Location", fmt.Sprintf("/api/items/%d", item.ID))
 
@@ -62,7 +58,7 @@ func (app *application) createCaseItemsHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (app *application) showItemsHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) showCaseHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
 		// Use the new notFoundResponse() helper.
@@ -85,7 +81,7 @@ func (app *application) showItemsHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (app *application) deleteItemHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) deleteCaseHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := app.readIDParam(r)
 	if err != nil {
@@ -109,7 +105,7 @@ func (app *application) deleteItemHandler(w http.ResponseWriter, r *http.Request
 		app.serverErrorResponse(w, r, err)
 	}
 }
-func (app *application) updateItemCaseHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) updateCaseHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := app.readIDParam(r)
 	if err != nil {
 		app.notFoundResponse(w, r)

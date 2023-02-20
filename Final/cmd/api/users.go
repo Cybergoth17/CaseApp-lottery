@@ -4,37 +4,32 @@ import (
 	"Final/internal/data"
 	"Final/internal/validator"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
-	// Create an anonymous struct to hold the expected data from the request body.
-	var input struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Role     string `json:"role"`
-	}
-	// Parse the request body into the anonymous struct.
-	err := app.readJSON(w, r, &input)
+	err := r.ParseForm()
 	if err != nil {
-		app.badRequestResponse(w, r, err)
+		http.Error(w, "Error parsing form data", http.StatusBadRequest)
 		return
 	}
-	// Copy the data from the request body into a new User struct. Notice also that we
-	// set the Activated field to false, which isn't strictly necessary because the
-	// Activated field will have the zero-value of false by default. But setting this
-	// explicitly helps to make our intentions clear to anyone reading the code.
+	username := r.Form.Get("username")
+	password := r.Form.Get("password")
+	email := r.Form.Get("email")
+	fmt.Println(password)
+	fmt.Println(email)
+
 	user := &data.User{
-		Name:      input.Name,
-		Email:     input.Email,
+		Name:      username,
+		Email:     email,
 		Activated: false,
-		Role:      input.Role,
+		Role:      "user",
 	}
 	// Use the Password.Set() method to generate and store the hashed and plaintext
 	// passwords.
-	err = user.Password.Set(input.Password)
+	err = user.Password.Set(password)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
@@ -50,9 +45,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	err = app.models.Users.Insert(user)
 	if err != nil {
 		switch {
-		// If we get a ErrDuplicateEmail error, use the v.AddError() method to manually
-		// add a message to the validator instance, and then call our
-		// failedValidationResponse() helper.
+
 		case errors.Is(err, data.ErrDuplicateEmail):
 			v.AddError("email", "a user with this email address already exists")
 			app.failedValidationResponse(w, r, v.Errors)
@@ -85,32 +78,24 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 
 	// Write a JSON response containing the user data along with a 201 Created status
 	// code.
-	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
+	http.Redirect(w, r, "/confirm", 303)
 }
 
 func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the plaintext activation token from the request body.
-	var input struct {
-		TokenPlaintext string `json:"token"`
-	}
-	err := app.readJSON(w, r, &input)
-	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
+	qs := r.URL.Query()
+
+	token := app.readString(qs, "token", "")
+	fmt.Println(token)
 	// Validate the plaintext token provided by the client.
 	v := validator.New()
-	if data.ValidateTokenPlaintext(v, input.TokenPlaintext); !v.Valid() {
+	if data.ValidateTokenPlaintext(v, token); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 	// Retrieve the details of the user associated with the token using the
 	// GetForToken() method (which we will create in a minute). If no matching record
 	// is found, then we let the client know that the token they provided is not valid.
-	user, err := app.models.Users.GetForToken(data.ScopeActivation, input.TokenPlaintext)
+	user, err := app.models.Users.GetForToken(data.ScopeActivation, token)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -143,8 +128,5 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	// Send the updated user details to the client in a JSON response.
-	err = app.writeJSON(w, http.StatusOK, envelope{"user": user}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
+	http.Redirect(w, r, "/", 303)
 }

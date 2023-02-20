@@ -76,31 +76,98 @@
         background-color: orange;
         width: 20px;
     }
+    .card1 {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        width: 300px;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    h2 {
+        font-size: 24px;
+        margin: 10px 0;
+    }
+
+    p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .rating {
+        margin-top: 10px;
+    }
+
+    .star {
+        color: #FFD700;
+        font-size: 24px;
+    }
+#card2{
+    display: none;
+}
+    #card13{
+        display: none;
+    }
+    #card3{
+        display: none;
+    }
+    #card10{
+        display: none;
+    }
+    #card14{
+        display: none;
+    }
 </style>
 <body>
-<table class="content-table">
-    <thead>
-    <tr>
-        <th>Rank</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Delete</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{range $i,$k :=.}}
-        <tr>
-            <td>{{$i}}</td>
-            <td>{{$k.ItemName}}</td>
-            <td>{{$k.ItemDescription}}</td>
-            <td>{{$k.Type}}</td>
-            <td>{{$k.Stars}}</td>
-        </tr>
+    {{range $a,$b :=.Items}}
+<div class="card1" id="card{{$b.ID}}">
+    <img src="/images/{{$b.ID}}" alt="My Image" width="200px">
+    <h2>{{$b.ItemName}}</h2>
+    <p>{{$b.ItemDescription}}</p>
+    <p>{{$b.Stars}}</p>
+    {{if  eq $b.Stars  5}}
+        <div class="rating">
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+        </div>
     {{end}}
-    </tbody>
-</table>
-
+    {{if eq $b.Stars  4}}
+        <div class="rating">
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+        </div>
+    {{end}}
+    {{if eq $b.Stars  3}}
+        <div class="rating">
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+        </div>
+    {{end}}
+    {{if eq $b.Stars  2}}
+        <div class="rating">
+            <span class="star">&#9733;</span>
+            <span class="star">&#9733;</span>
+        </div>
+    {{end}}
+    {{if eq $b.Stars  1}}
+        <div class="rating">
+            <span class="star">&#9733;</span>
+        </div>
+    {{end}}
+</div>
+    {{end}}
+    <h1>{{.Name}} case</h1>
+    <h2>Wish you luck!</h2>
 <div class="cardList"><!--
     --><div class="card common">Common</div><!--
     --><div class="card rare">Rare</div><!--
@@ -139,13 +206,12 @@
             newDistance *= rand;
         }
         newMargin = -(newDistance);
-        console.log(newMargin)
-        findWinningCard(newMargin)
-        animate(cards[0], newMargin, speed);
-
+        animate(cards[0], newMargin, speed, function() {
+            findWinningCard(newMargin);
+        });
     }
 
-    function animate(element, newMargin, duration) {
+    function animate(element, newMargin, duration, callback) {
         var start = new Date().getTime();
         var end = start + duration;
         var current = parseInt(element.style.marginLeft) || 0;
@@ -158,6 +224,8 @@
             element.style.marginLeft = current + 'px';
             if ((direction > 0 && current < parseInt(newMargin)) || (direction < 0 && current > parseInt(newMargin))) {
                 requestAnimationFrame(frame);
+            } else {
+                callback();
             }
         }
 
@@ -173,7 +241,8 @@
         var cardList = document.querySelector('.cardList');
         var cards = document.querySelectorAll('.card');
         var winningClass=null
-
+        var card2 =document.getElementById("card2")
+        var spin=document.getElementById('spin')
 
         var winningIndex = Math.floor(((Math.abs(newMargin)+150) / 370));
         console.log(winningIndex)
@@ -200,7 +269,9 @@
 
         switch (winningClass) {
             case "common":
-                console.log("You won a common card!");
+                card2.style.display="block"
+                cardList.style.display="none"
+                spin.style.display="none"
                 break;
             case "rare":
                 console.log("You won a rare card!");

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table class="content-table">
+  <thead>
+  <tr>
+    <th>Rank</th>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Delete</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <tr>
+    <td>{{.ID}}</td>
+    <td>{{.Name}}</td>
+    <td>{{.Price}}</td>
+    {{range $i,$k :=.Items}}
+    <td>{{$i}}</td>
+    <td>{{$k.ItemName}}</td>
+    <td>{{$k.ItemDescription}}</td>
+    <td>{{$k.Type}}</td>
+    <td>{{$k.Stars}}</td>
+    <td><img src="/images/{{$k.ID}}" alt="My Image" width="200px"></td>
+  {{end}}
+  </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

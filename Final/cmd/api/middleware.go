@@ -8,7 +8,6 @@ import (
 	"golang.org/x/time/rate"
 	"net"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 )
@@ -89,48 +88,31 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Add the "Vary: Authorization" header to the response. This indicates to any
-		// caches that the response may vary based on the value of the Authorization
-		// header in the request.
+
 		w.Header().Add("Vary", "Authorization")
-		// Retrieve the value of the Authorization header from the request. This will
-		// return the empty string "" if there is no such header found.
-		authorizationHeader := r.Header.Get("Authorization")
-		// If there is no Authorization header found, use the contextSetUser() helper
-		// that we just made to add the AnonymousUser to the request context. Then we
-		// call the next handler in the chain and return without executing any of the
-		// code below.
-		if authorizationHeader == "" {
+
+		cookie, err := r.Cookie("token")
+		if err == http.ErrNoCookie {
 			r = app.contextSetUser(r, data.AnonymousUser)
 			next.ServeHTTP(w, r)
 			return
 		}
-		// Otherwise, we expect the value of the Authorization header to be in the format
-		// "Bearer <token>". We try to split this into its constituent parts, and if the
-		// header isn't in the expected format we return a 401 Unauthorized response
-		// using the invalidAuthenticationTokenResponse() helper (which we will create
-		// in a moment).
-		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-			app.invalidAuthenticationTokenResponse(w, r)
+		if cookie.Value == "" {
+			r = app.contextSetUser(r, data.AnonymousUser)
+			next.ServeHTTP(w, r)
 			return
 		}
-		// Extract the actual authentication token from the header parts.
-		token := headerParts[1]
-		// Validate the token to make sure it is in a sensible format.
+
+		token := cookie.Value
 		v := validator.New()
-		// If the token isn't valid, use the invalidAuthenticationTokenResponse()
-		// helper to sexnd a response, rather than the failedValidationResponse() helper
-		// that we'd normally use.
+
 		if data.ValidateTokenPlaintext(v, token); !v.Valid() {
 			app.invalidAuthenticationTokenResponse(w, r)
 			return
 		}
-		// Retrieve the details of the user associated with the authentication token,
-		// again calling the invalidAuthenticationTokenResponse() helper if no
-		// matching record was found. IMPORTANT: Notice that we are using
-		// ScopeAuthentication as the first parameter here.
+
 		user, err := app.models.Users.GetForToken(data.ScopeAuthentication, token)
+
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
@@ -140,10 +122,9 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 			}
 			return
 		}
-		// Call the contextSetUser() helper to add the user information to the request
-		// context.
+
 		r = app.contextSetUser(r, user)
-		// Call the next handler in the chain.
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -177,49 +158,47 @@ func (app *application) requireActivatedUser(next http.HandlerFunc) http.Handler
 
 func (app *application) requireAdminUser(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authorizationHeader := r.Header.Get("Authorization")
-		// If there is no Authorization header found, use the contextSetUser() helper
-		// that we just made to add the AnonymousUser to the request context. Then we
-		// call the next handler in the chain and return without executing any of the
-		// code below.
-		fmt.Println(authorizationHeader)
-		if authorizationHeader == "" {
-			r = app.contextSetUser(r, data.AnonymousUser)
-			next.ServeHTTP(w, r)
+		cookie, err := r.Cookie("token")
+		if err == http.ErrNoCookie {
+			http.Redirect(w, r, "/", 303)
 			return
 		}
-		// Otherwise, we expect the value of the Authorization header to be in the format
-		// "Bearer <token>". We try to split this into its constituent parts, and if the
-		// header isn't in the expected format we return a 401 Unauthorized response
-		// using the invalidAuthenticationTokenResponse() helper (which we will create
-		// in a moment).
-		headerParts := strings.Split(authorizationHeader, " ")
-		if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-			app.invalidAuthenticationTokenResponse(w, r)
+		if cookie.Value == "" {
+			http.Redirect(w, r, "/", 303)
 			return
 		}
-		// Extract the actual authentication token from the header parts.
-		token := headerParts[1]
-		// Validate the token to make sure it is in a sensible format.
+
+		token := cookie.Value
+
 		v := validator.New()
-		// If the token isn't valid, use the invalidAuthenticationTokenResponse()
-		// helper to sexnd a response, rather than the failedValidationResponse() helper
-		// that we'd normally use.
+
 		if data.ValidateTokenPlaintext(v, token); !v.Valid() {
 			app.invalidAuthenticationTokenResponse(w, r)
 			return
 		}
-		// Retrieve the details of the user associated with the authentication token,
-		// again calling the invalidAuthenticationTokenResponse() helper if no
-		// matching record was found. IMPORTANT: Notice that we are using
-		// ScopeAuthentication as the first parameter here.
+
 		user, _ := app.models.Users.GetForToken(data.ScopeAuthentication, token)
 		fmt.Println(user.Role)
 		if user.Role != "admin" {
-			app.notADminAccountResponse(w, r)
+			http.Redirect(w, r, "/permission", 303)
 			return
 		}
-		// Call the next handler in the chain.
+
 		next.ServeHTTP(w, r)
 	})
+}
+func tokenBlyat(token string) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "http://127.0.0.1:4000/case", nil)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	// Send the HTTP request
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 }
