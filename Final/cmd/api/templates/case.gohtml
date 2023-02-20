@@ -12,26 +12,32 @@
     }
 
     .cardList {
-        height: 100px;
+        height: 110px;
         width: 300px;
-        position: relative;
-        margin: 10px;
         border: 1px solid #33e;
         overflow: hidden;
         white-space: nowrap;
-    }
 
+    }
+.spinning{
+    width: 300px;
+    height: 200px;
+    margin: auto; /* center the box horizontally */
+    position: absolute; /* position the box */
+    top: 0; bottom: 0; left: 0; right: 0; /* center the box vertically */
+    box-sizing: border-box; /* include padding in the width calculation */
+    text-align: center;
+}
     .card {
         display: inline-block;
         text-align: center;
-        height: 100px;
+        height: 110px;
         width: 100px;
         line-height: 100px;
         background-color: #99e;
         font-family: monospace;
         font-size: 2em;
-        color: #444;
-
+        align-items: center;
     }
 
     .cardList::before,
@@ -48,32 +54,36 @@
 
     .cardList::before {
         position: absolute;
-        top: 0px;
+        top: 80px;
         left: 50%;
         border-top: 12px solid #33e;
     }
 
     .cardList::after {
         position: absolute;
-        bottom: 0px;
+        bottom: 5%;
         left: 50%;
         border-bottom: 12px solid #33e;
     }
 
     .common {
-        background-color: green;
-        width: 200px;
+       background-image: url("../cmd/common.png");
+        width: 180px;
     }
-    .rare {
-        background-color: lightblue;
+    .nonrare {
+        background-image: url("../cmd/2star.png");
         width: 100px;
     }
+    .rare{
+        background-image: url("../cmd/3star.png");
+        width: 60px;
+    }
     .mythical {
-        background-color: yellow;
-        width: 50px;
+        background-image: url("../cmd/4star.png");
+        width: 40px;
     }
     .legendary {
-        background-color: orange;
+        background-image: url("../cmd/5star.png");
         width: 20px;
     }
     .card1 {
@@ -81,8 +91,24 @@
         border-radius: 4px;
         padding: 10px;
         width: 300px;
+        display: none;
     }
-
+    #spin{
+        background-color:#40867d;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 10px;
+    }
+    .cardList {
+        top:60px;
+    }
     img {
         width: 100%;
     }
@@ -93,7 +119,7 @@
     }
 
     p {
-        font-size: 16px;
+        font-size: 14px;
         line-height: 1.5;
         margin: 0;
     }
@@ -106,29 +132,18 @@
         color: #FFD700;
         font-size: 24px;
     }
-#card2{
-    display: none;
-}
-    #card13{
-        display: none;
-    }
-    #card3{
-        display: none;
-    }
-    #card10{
-        display: none;
-    }
-    #card14{
-        display: none;
+
+    .cardList p{
+        font-weight: bold;
+        font-size: 24px;
     }
 </style>
 <body>
     {{range $a,$b :=.Items}}
-<div class="card1" id="card{{$b.ID}}">
+<div class="card1" id="card{{$a}}">
     <img src="/images/{{$b.ID}}" alt="My Image" width="200px">
     <h2>{{$b.ItemName}}</h2>
     <p>{{$b.ItemDescription}}</p>
-    <p>{{$b.Stars}}</p>
     {{if  eq $b.Stars  5}}
         <div class="rating">
             <span class="star">&#9733;</span>
@@ -166,15 +181,20 @@
     {{end}}
 </div>
     {{end}}
+    <div class="spinning">
+    <div id="luck">
     <h1>{{.Name}} case</h1>
     <h2>Wish you luck!</h2>
+    </div>
 <div class="cardList"><!--
-    --><div class="card common">Common</div><!--
-    --><div class="card rare">Rare</div><!--
-    --><div class="card mythical">M</div><!--
-    --><div class="card legendary">L</div><!--
---></div>
+    --> <div class="card common"><p>Common</p>  </div><!--
+    --><div class="card nonrare"><p>NotRare</p></div><!--
+    --><div class="card rare"><p>Rare</p></div><!--
+    --><div class="card mythical"><p>M</p></div><!--
+    --><div class="card legendary"><p>L</p></div><!--
+    --></div>
 <button id="spin">Spin</button>
+    </div>
 <div id="winning-card-type"></div>
 </body>
 <script>
@@ -190,10 +210,12 @@
         var clone1 = cards[1].cloneNode(true);
         var clone2 = cards[2].cloneNode(true);
         var clone3 = cards[3].cloneNode(true);
+        var clone4 = cards[4].cloneNode(true);
         cardList.appendChild(clone);
         cardList.appendChild(clone1);
         cardList.appendChild(clone2);
         cardList.appendChild(clone3);
+        cardList.appendChild(clone4);
     }
 
     function spin() {
@@ -205,10 +227,12 @@
             var rand = Math.floor((Math.random() * 100) + 1);
             newDistance *= rand;
         }
+
         newMargin = -(newDistance);
         animate(cards[0], newMargin, speed, function() {
-            findWinningCard(newMargin);
-        });
+            setTimeout(function() {
+                findWinningCard(newMargin);
+            }, 1000);});
     }
 
     function animate(element, newMargin, duration, callback) {
@@ -241,8 +265,13 @@
         var cardList = document.querySelector('.cardList');
         var cards = document.querySelectorAll('.card');
         var winningClass=null
-        var card2 =document.getElementById("card2")
+        var card2 =document.getElementById("card0")
+        var card13 =document.getElementById("card1")
+        var card3 =document.getElementById("card2")
+        var card10 =document.getElementById("card3")
+        var card14 =document.getElementById("card4")
         var spin=document.getElementById('spin')
+        var luck=document.getElementById('luck')
 
         var winningIndex = Math.floor(((Math.abs(newMargin)+150) / 370));
         console.log(winningIndex)
@@ -257,13 +286,15 @@
         }
         console.log(res)
 
-        if (res<=200){
+        if (res<=180){
             winningClass="common";
-        }else if(res<=300){
+        }else if(res<=280){
+            winningClass="nonrare";
+        }else if(res<=340){
             winningClass="rare";
-        }else if(res<=350){
+        }else if(res<=380){
             winningClass="mythical";
-        }else if(res<=370){
+        }else if(res<=400){
             winningClass="legendary"
         }
 
@@ -272,15 +303,31 @@
                 card2.style.display="block"
                 cardList.style.display="none"
                 spin.style.display="none"
+                luck.style.display="none"
+                break;
+            case "nonrare":
+                card13.style.display="block"
+                cardList.style.display="none"
+                spin.style.display="none"
+                luck.style.display="none"
                 break;
             case "rare":
-                console.log("You won a rare card!");
-                break;
+                card3.style.display="block"
+                cardList.style.display="none"
+                spin.style.display="none"
+                luck.style.display="none"
+                break
             case "mythical":
-                console.log("You won a mythical card!");
+                card10.style.display="block"
+                cardList.style.display="none"
+                spin.style.display="none"
+                luck.style.display="none"
                 break;
             case "legendary":
-                console.log("You won a legendary card!");
+                card14.style.display="block"
+                cardList.style.display="none"
+                spin.style.display="none"
+                luck.style.display="none"
                 break;
             default:
                 console.log("Unknown card type");

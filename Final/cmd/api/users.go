@@ -25,7 +25,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		Name:      username,
 		Email:     email,
 		Activated: false,
-		Role:      "user",
+		Role:      "admin",
 	}
 	// Use the Password.Set() method to generate and store the hashed and plaintext
 	// passwords.
