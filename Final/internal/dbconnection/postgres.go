@@ -1,16 +1,7 @@
 package dbconnection
 
-import (
-	"fmt"
-)
-
 func DbConnection() (psqlInformation string) {
-	host := "127.0.0.1"
-	port := "5432"
-	user := "postgres"
-	password := "2405"
-	dbname := "final"
 
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	psqlInfo := "postgres://diamondw:KIaX1gqhAn4XGhZOBgGoOIQ9jZFY2SBo@dpg-cfr0s66n6mpirvtv7a6g-a.oregon-postgres.render.com/golang_4qkc"
 	return psqlInfo
 }

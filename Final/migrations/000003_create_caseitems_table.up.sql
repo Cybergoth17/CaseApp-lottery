@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS caseitems (
                                          itemname text NOT NULL,
                                          itemdesc text NOT NULL,
                                          type text NOT NULL,
-                                         stars integer NOT NULL
+                                         stars integer NOT NULL,
+                                         image BYTEA NOT NULL
 );

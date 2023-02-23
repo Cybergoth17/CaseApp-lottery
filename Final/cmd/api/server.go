@@ -16,8 +16,8 @@ func (app *application) serve() error {
 		Addr:         fmt.Sprintf(":%d", app.config.port),
 		Handler:      app.routes(),
 		IdleTimeout:  time.Minute,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 60 * time.Second,
 	}
 	shutdownError := make(chan error)
 	go func() {

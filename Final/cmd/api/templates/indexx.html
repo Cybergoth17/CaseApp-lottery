@@ -7,12 +7,16 @@
     <title>main page</title>
 </head>
 <style>
-        @import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+    @font-face {
+        font-family: 'MyCustomFont'; /* Choose a name for your font family */
+        src: url("../cmd/zh-cn.ttf"); /* Replace 'path/to/your/font/file.ttf' with the path to your font file */
+    }
+
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins',sans-serif;
+    font-family: 'MyCustomFont', sans-serif;
 }
 section{
     position: relative;
@@ -115,17 +119,17 @@ header ul li a{
             <div class="circle"></div>
             <header>
                 <ul>
-                    <li><a href="#">Home</a></li>
+                    <li><a href="/">Home</a></li>
                     <li><a href="#">Shop</a></li>
-                    <li><a href="#" style="color: #9c1d1d;">Login</a></li>
-                    <li><a href="#" style="color: #9c1d1d;">Register</a></li>
+                    <li><a href="/login" style="color: #9c1d1d;">Login</a></li>
+                    <li><a href="/register" style="color: #9c1d1d;">Register</a></li>
                 </ul>
             </header>
             <div class="content">
                 <div class="textBox">
-                    <p style="font-size: 40px;font-weight: 500;"> Promote your account in <span class="colortext">Genshin Impact</span> with us .</p>
+                    <p style="font-size: 40px;font-weight: 500;"> Promote your account in <span class="colortext">Genshin Impact</span> with us</p>
                     <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit velit mollitia veritatis perferendis. Iure, iusto quos? Fugit nostrum veniam repellendus quis? Quia omnis vero, eaque sint molestiae unde dolorum fugiat!</p>
-                    <a href="#" class="button">Learn more</a>
+                    <a href="/login" class="button">Let's start</a>
                 </div>
                 <div class="ImgBox">
                     <img src="cmd/klee.png" style="width:280px" class="starbucks">

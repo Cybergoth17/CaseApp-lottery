@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>main page</title>
+</head>
+<style>
+  @font-face {
+    font-family: 'MyCustomFont'; /* Choose a name for your font family */
+    src: url("../cmd/zh-cn.ttf"); /* Replace 'path/to/your/font/file.ttf' with the path to your font file */
+  }
+  *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'MyCustomFont', sans-serif;
+  }
+  section{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+  }
+  header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header ul{
+    position: relative;
+    display: flex;
+  }
+  header ul li{
+    list-style: none;
+  }
+  header ul li a{
+    display: inline-block;
+    color: #333;
+    font-weight: 400;
+    margin-left: 40px;
+    text-decoration: none;
+  }
+  .content{
+    width: 100%;
+    align-items: center;
+    width: 700px;
+    padding: 10px;
+    border: 5px solid gray;
+    margin: 0;
+    text-align: center;
+  }
+  input[type=text] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #40867d;
+    border-radius: 4px;
+  }
+  input[type=number] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #40867d;
+    border-radius: 4px;
+  }
+  input[type=file] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #40867d;
+    border-radius: 4px;
+  }
+  .content .imgBox{
+    width: 600px;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 50px;
+    margin-top: 50px;
+    transition: 0.5s;
+  }
+  .content .imgBox{
+    max-width: 340px;
+    transition: 0.5s;
+  }
+  .circle{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #40867d;
+    clip-path: circle(600px at right 800px);
+  }
+  .textBox{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.5s;
+  }
+  h2{
+    color: #40867d;
+  }
+  button {
+    background-color:#40867d;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  .classx{
+    display: flex;
+    flex-direction: column;
+  }
+  .classx select{
+    margin: 5px;
+    width: 100%;
+    height: 30px;
+    box-sizing: border-box;
+    border: 2px solid #40867d;
+    border-radius: 4px;
+  }
+  option{
+    width: 100%;
+
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #40867d;
+    border-radius: 4px;
+
+  }
+</style>
+<body>
+<section>
+  <div class="circle"></div>
+  <header>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/store">Shop</a></li>
+    </ul>
+  </header>
+  <div class="textBox">
+
+    <div class="content">
+      <center><h2>Add new case</h2></center>
+      <br>
+      <form method="post" >
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price"><br><br>
+
+        <label>Items:</label>
+        <div class="classx">
+        <select name="star1">
+          {{ range $a,$b:=. }}
+          {{ if eq $b.Stars 1 }}
+          <option value="{{$b.ItemName}}">{{$b.ItemName}}</option>
+          {{ end }}
+          {{ end }}
+        </select>
+
+        <select name="star2">
+          {{ range $a,$b:=. }}
+          {{ if eq $b.Stars 2 }}
+          <option value="{{$b.ItemName}}">{{$b.ItemName}}</option>
+          {{ end }}
+          {{ end }}
+        </select>
+
+        <select name="star3">
+          {{ range $a,$b:=. }}
+          {{ if eq $b.Stars 3 }}
+          <option value="{{$b.ItemName}}">{{$b.ItemName}}</option>
+          {{ end }}
+          {{ end }}
+        </select>
+
+        <select name="star4">
+          {{ range $a,$b:=. }}
+          {{ if eq $b.Stars 4 }}
+          <option value="{{$b.ItemName}}">{{$b.ItemName}}</option>
+          {{ end }}
+          {{ end }}
+        </select>
+
+        <select name="star5">
+          {{ range $a,$b:=. }}
+          {{ if eq $b.Stars 5 }}
+          <option value="{{$b.ItemName}}">{{$b.ItemName}}</option>
+          {{ end }}
+          {{ end }}
+        </select>
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    <div class="ImgBox">
+      <img src="cmd/loh.png" class="starbucks">
+    </div>
+  </div>
+</section>
+</body>
+</html>
+
+

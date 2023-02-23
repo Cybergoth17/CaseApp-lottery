@@ -4,55 +4,54 @@ import (
 	"Final/internal/data"
 	"Final/internal/validator"
 	"errors"
+	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
-	// Create an anonymous struct to hold the expected data from the request body.
-	var input struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Role     string `json:"role"`
-	}
-	// Parse the request body into the anonymous struct.
-	err := app.readJSON(w, r, &input)
+	err := r.ParseForm()
 	if err != nil {
-		app.badRequestResponse(w, r, err)
+		http.Error(w, "Error parsing form data", http.StatusBadRequest)
 		return
 	}
-	// Copy the data from the request body into a new User struct. Notice also that we
-	// set the Activated field to false, which isn't strictly necessary because the
-	// Activated field will have the zero-value of false by default. But setting this
-	// explicitly helps to make our intentions clear to anyone reading the code.
+	name := r.Form.Get("username")
+	password := r.Form.Get("password")
+	email := r.Form.Get("email")
+	fmt.Println(password)
+	fmt.Println(email)
+
 	user := &data.User{
-		Name:      input.Name,
-		Email:     input.Email,
+		Name:      name,
+		Email:     email,
 		Activated: false,
-		Role:      input.Role,
+		Role:      "admin",
+		Balance:   5000,
 	}
-	// Use the Password.Set() method to generate and store the hashed and plaintext
-	// passwords.
-	err = user.Password.Set(input.Password)
+
+	err = user.Password.Set(password)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 	v := validator.New()
-	// Validate the user struct and return the error messages to the client if any of
-	// the checks fail.
+
 	if data.ValidateUser(v, user); !v.Valid() {
-		app.failedValidationResponse(w, r, v.Errors)
-		return
+		if v.Errors["password"] != "" {
+			http.Redirect(w, r, "/errors?err="+v.Errors["password"], 303)
+			return
+		} else if v.Errors["name"] != "" {
+			http.Redirect(w, r, "/errors?err="+v.Errors["name"], 303)
+			return
+		}
 	}
-	// Insert the user data into the database.
+
 	err = app.models.Users.Insert(user)
 	if err != nil {
 		switch {
-		// If we get a ErrDuplicateEmail error, use the v.AddError() method to manually
-		// add a message to the validator instance, and then call our
-		// failedValidationResponse() helper.
+
 		case errors.Is(err, data.ErrDuplicateEmail):
 			v.AddError("email", "a user with this email address already exists")
 			app.failedValidationResponse(w, r, v.Errors)
@@ -68,49 +67,33 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	app.background(func() {
-		// As there are now multiple pieces of data that we want to pass to our email
-		// templates, we create a map to act as a 'holding structure' for the data. This
-		// contains the plaintext version of the activation token for the user, along
-		// with their ID.
+
 		data := map[string]interface{}{
 			"activationToken": token.Plaintext,
 			"userID":          user.ID,
 		}
-		// Send the welcome email, passing in the map above as dynamic data.
+
 		err = app.mailer.Send(user.Email, "user_welcome.tmpl", data)
 		if err != nil {
 			app.logger.PrintError(err, nil)
 		}
 	})
 
-	// Write a JSON response containing the user data along with a 201 Created status
-	// code.
-	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
+	http.Redirect(w, r, "/confirm", 303)
 }
 
 func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse the plaintext activation token from the request body.
-	var input struct {
-		TokenPlaintext string `json:"token"`
-	}
-	err := app.readJSON(w, r, &input)
-	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-	// Validate the plaintext token provided by the client.
+	qs := r.URL.Query()
+
+	token := app.readString(qs, "token", "")
+
 	v := validator.New()
-	if data.ValidateTokenPlaintext(v, input.TokenPlaintext); !v.Valid() {
+	if data.ValidateTokenPlaintext(v, token); !v.Valid() {
 		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
-	// Retrieve the details of the user associated with the token using the
-	// GetForToken() method (which we will create in a minute). If no matching record
-	// is found, then we let the client know that the token they provided is not valid.
-	user, err := app.models.Users.GetForToken(data.ScopeActivation, input.TokenPlaintext)
+
+	user, err := app.models.Users.GetForToken(data.ScopeActivation, token)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):
@@ -121,10 +104,9 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		}
 		return
 	}
-	// Update the user's activation status.
+
 	user.Activated = true
-	// Save the updated user record in our database, checking for any edit conflicts in
-	// the same way that we did for our movie records.
+	user.Balance = 5000
 	err = app.models.Users.Update(user)
 	if err != nil {
 		switch {
@@ -135,16 +117,81 @@ func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Reque
 		}
 		return
 	}
-	// If everything went successfully, then we delete all activation tokens for the
-	// user.
+
 	err = app.models.Tokens.DeleteAllForUser(data.ScopeActivation, user.ID)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
-	// Send the updated user details to the client in a JSON response.
-	err = app.writeJSON(w, http.StatusOK, envelope{"user": user}, nil)
+
+	http.Redirect(w, r, "/", 303)
+}
+
+func (app *application) balanceMinusHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	num, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
-		app.serverErrorResponse(w, r, err)
+		fmt.Println("Error:", err)
 	}
+	x, _ := app.models.Case.GetCaseID(num)
+	token, _ := r.Cookie("token")
+	userFound, _ := app.models.Users.GetForToken(data.ScopeAuthentication, token.Value)
+	balanceNum := userFound.Balance
+	if balanceNum <= 0 || balanceNum-x.Price < 0 {
+		//todo
+		http.Redirect(w, r, "/", 303)
+	}
+	newB := balanceNum - x.Price
+
+	userFound.Balance = newB
+	if newB > 0 {
+		_ = app.models.Users.Update(userFound)
+		http.Redirect(w, r, "/case/"+id, 303)
+	}
+
+}
+
+func (app *application) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	num, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	err = app.models.Users.DeleteUser(num)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+	token, _ := r.Cookie("token")
+	token.MaxAge = -1
+	http.SetCookie(w, token)
+	http.Redirect(w, r, "/logout", 303)
+}
+
+func (app *application) updateUserHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	token, _ := r.Cookie("token")
+	user, _ := app.models.Users.GetForToken(data.ScopeAuthentication, token.Value)
+	user.Name = r.Form.Get("name")
+	err = app.models.Users.Update(user)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
+	}
+
+	http.Redirect(w, r, "/profile", 303)
 }

@@ -14,6 +14,7 @@ type CaseItems struct {
 	ItemDescription string `json:"itemdescription"`
 	Type            string `json:"type"`
 	Stars           int64  `json:"stars"`
+	Image           []byte `json:"image"`
 }
 
 type CaseItemModel struct {
@@ -23,10 +24,10 @@ type CaseItemModel struct {
 // that we did when creating a movie.
 func (m CaseItemModel) InsertItem(item *CaseItems) error {
 	query := `
-INSERT INTO caseitems(itemname, itemdesc, type, stars)
-VALUES ($1, $2, $3, $4)
+INSERT INTO caseitems(itemname, itemdesc, type, stars,image)
+VALUES ($1, $2, $3, $4,$5)
 RETURNING id`
-	args := []any{item.ItemName, item.ItemDescription, item.Type, item.Stars}
+	args := []any{item.ItemName, item.ItemDescription, item.Type, item.Stars, item.Image}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	// If the table already contains a record with this email address, then when we try
@@ -52,7 +53,7 @@ func (m CaseItemModel) GetCaseItem(id int64) (*CaseItems, error) {
 	}
 
 	query := `
-SELECT id, itemname, itemdesc, type,stars
+SELECT id, itemname, itemdesc, type,stars,image
 FROM caseitems
 WHERE id = $1`
 
@@ -63,6 +64,7 @@ WHERE id = $1`
 		&item.ItemDescription,
 		&item.Type,
 		&item.Stars,
+		&item.Image,
 	)
 
 	if err != nil {
@@ -105,7 +107,7 @@ WHERE id = $1`
 func (m CaseItemModel) UpdateItem(item *CaseItems) error {
 	query := `
 UPDATE caseitems
-SET itemname = $1, itemdesc = $2, type = $3, stars = $4
+SET itemname = $1, itemdesc = $2, type = $3, stars = $4, image=$6
 WHERE id = $5
 RETURNING id`
 
@@ -115,6 +117,7 @@ RETURNING id`
 		item.Type,
 		item.Stars,
 		item.ID,
+		item.Image,
 	}
 
 	return m.DB.QueryRow(query, args...).Scan(&item.ID)
@@ -124,7 +127,7 @@ func (m CaseItemModel) GetAllCaseItem(itemname string, typee string, filters Fil
 	// Update the SQL query to include the LIMIT and OFFSET clauses with placeholder
 	// parameter values.
 	query := fmt.Sprintf(`
-SELECT count(*) OVER(), id, itemname,itemdesc,type,stars
+SELECT count(*) OVER(), id, itemname,itemdesc,type,stars, image
 FROM caseitems
 WHERE (to_tsvector('simple', itemname) @@ plainto_tsquery('simple', $1) OR $1 = '') 
 ORDER BY %s %s, id ASC
@@ -149,6 +152,7 @@ LIMIT $2 OFFSET $3`, filters.sortColumn(), filters.sortDirection())
 			&item.ItemDescription,
 			&item.Type,
 			&item.Stars,
+			&item.Image,
 		)
 		if err != nil {
 			return nil, Metadata{}, err // Update this to return an empty Metadata struct.
@@ -163,4 +167,36 @@ LIMIT $2 OFFSET $3`, filters.sortColumn(), filters.sortDirection())
 	metadata := calculateMetadata(totalRecords, filters.Page, filters.PageSize)
 	// Include the metadata struct when returning.
 	return items, metadata, nil
+}
+
+func (m CaseItemModel) GetCaseItemByName(name string) (*CaseItems, error) {
+
+	if name == "" {
+		return nil, ErrRecordNotFound
+	}
+
+	query := `
+SELECT id, itemname, itemdesc, type,stars,image
+FROM caseitems
+WHERE itemname = $1`
+
+	var item CaseItems
+	err := m.DB.QueryRow(query, name).Scan(
+		&item.ID,
+		&item.ItemName,
+		&item.ItemDescription,
+		&item.Type,
+		&item.Stars,
+		&item.Image,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	return &item, nil
 }

@@ -2,30 +2,45 @@ package main
 
 import (
 	"Final/internal/data"
-	"Final/internal/validator"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 func (app *application) createCaseItemsHandler(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		ItemName        string `json:"itemname"`
-		ItemDescription string `json:"itemdescription"`
-		Type            string `json:"type"`
-		Stars           int64  `json:"stars"`
-	}
-	err := app.readJSON(w, r, &input)
+	err := r.ParseForm()
 	if err != nil {
-		app.badRequestResponse(w, r, err)
+		http.Error(w, "Error parsing form data", http.StatusBadRequest)
 		return
 	}
-	// Copy the values from the input struct to a new Movie struct.
+	file, _, err := r.FormFile("image")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	data1, err := ioutil.ReadAll(file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	itemname := r.Form.Get("itemname")
+	itemdesc := r.Form.Get("itemdescription")
+	typee := r.Form.Get("type")
+	stars := r.Form.Get("stars")
+	num, err := strconv.ParseInt(stars, 10, 64)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
 	item := &data.CaseItems{
-		ItemName:        input.ItemName,
-		ItemDescription: input.ItemDescription,
-		Type:            input.Type,
-		Stars:           input.Stars,
+		ItemName:        itemname,
+		ItemDescription: itemdesc,
+		Type:            typee,
+		Stars:           num,
+		Image:           data1,
 	}
 	// Initialize a new Validator.
 
@@ -41,10 +56,7 @@ func (app *application) createCaseItemsHandler(w http.ResponseWriter, r *http.Re
 	headers := make(http.Header)
 	headers.Set("Location", fmt.Sprintf("/api/items/%d", item.ID))
 
-	err = app.writeJSON(w, http.StatusCreated, envelope{"case item": item}, headers)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
+	http.Redirect(w, r, "/list", 303)
 }
 
 func (app *application) showItemsHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,6 +129,7 @@ func (app *application) updateItemCaseHandler(w http.ResponseWriter, r *http.Req
 		ItemDescription *string `json:"itemdescription"`
 		Type            *string `json:"type"`
 		Stars           *int64  `json:"stars"`
+		Image           *[]byte `json:"image"`
 	}
 	// Decode the JSON as normal.
 	err = app.readJSON(w, r, &input)
@@ -145,37 +158,6 @@ func (app *application) updateItemCaseHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 	err = app.writeJSON(w, http.StatusOK, envelope{"updated case item": item}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-	}
-}
-
-func (app *application) listCasesHandler(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Itemname string
-		Type     string
-		data.Filters
-	}
-	v := validator.New()
-	qs := r.URL.Query()
-	input.Itemname = app.readString(qs, "itemname", "")
-	input.Type = app.readString(qs, "type", "")
-	input.Filters.Page = app.readInt(qs, "page", 1, v)
-	input.Filters.PageSize = app.readInt(qs, "page_size", 20, v)
-	input.Filters.Sort = app.readString(qs, "sort", "id")
-	input.Filters.SortSafelist = []string{"id", "itemname", "type", "stars", "-id", "-itemname", "-type", "-stars"}
-	if data.ValidateFilters(v, input.Filters); !v.Valid() {
-		app.failedValidationResponse(w, r, v.Errors)
-		return
-	}
-	// Accept the metadata struct as a return value.
-	items, metadata, err := app.models.CaseItem.GetAllCaseItem(input.Itemname, input.Type, input.Filters)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
-	// Include the metadata in the response envelope.
-	err = app.writeJSON(w, http.StatusOK, envelope{"items": items, "metadata": metadata}, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

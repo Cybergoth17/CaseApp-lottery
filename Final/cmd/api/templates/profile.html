@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+</head>
+<style>
+    @font-face {
+        font-family: 'MyCustomFont'; /* Choose a name for your font family */
+        src: url("../cmd/zh-cn.ttf"); /* Replace 'path/to/your/font/file.ttf' with the path to your font file */
+    }
+    body{
+        margin-top:20px;
+        text-align: left;
+        background-color: #9ebfef;
+        font-family: 'MyCustomFont', sans-serif;
+    }
+    header{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px 100px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    header ul{
+        position: relative;
+        display: flex;
+    }
+    header ul li{
+        list-style: none;
+    }
+    header ul li a{
+        display: inline-block;
+        color: black;
+        font-weight: 400;
+        margin-left: 40px;
+        text-decoration: none;
+    }
+    h1{
+        font-size: 48px;
+        color: white;
+    }
+
+    .main-body {
+        padding: 15px;
+    }
+    .card1 {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    }
+
+    .card1 {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+    }
+
+    .card-body {
+        flex: 1 1 auto;
+        min-height: 1px;
+        padding: 1rem;
+    }
+
+    .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+    .gutters-sm>.col, .gutters-sm>[class*=col-] {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+    .mb-3, .my-3 {
+        margin-bottom: 1rem!important;
+    }
+
+    a{
+        color: white;
+        text-decoration: none;
+    }
+    a:hover{
+        color: white;
+    }
+    .card3 {
+        width: 300px;
+        margin: 80px 80px 20px 20px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .card3 img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .card3 h3 {
+        margin: 20px;
+        font-size: 1.2em;
+        text-align: center;
+    }
+    .card3 button {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #2dbd69;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        text-decoration: none;
+    }
+    .card3 button a{
+        text-decoration: none;
+        color: #fff;
+    }
+    .card3 button:hover {
+        background-color: #08833c;
+    }
+    .container1 {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        padding: 50px;
+    }
+    button{
+        background-color: #2dbd69;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        text-decoration: none;
+    }
+</style>
+<body>
+<header>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/store">Shop</a></li>
+        <li><a href="/profile">Profile</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
+</header>
+<div class="container" style="margin-top: 100px">
+    <h1 style="text-align: center">Profile</h1>
+    <div class="main-body">
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card1">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <img src="https://i.pinimg.com/236x/6f/18/be/6f18be59c388a4048cb348b503baf366.jpg" alt="Admin" class="rounded-circle" width="150">
+                            <div class="mt-3">
+                                <h4>{{.Name}}</h4>
+                                <p class="text-secondary mb-1">Главная Почимучка</p>
+                                <p class="text-muted font-size-sm">Kazakhstan, AITU</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Full Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{.Name}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{.Email}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Role</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{.Role}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Balance</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{.Balance}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Delete Account</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <a href="/users/delete/{{.ID}}" style="color: black">Delete</a>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Update Username</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <form method="post">
+                                    <input type="text" name="name">
+                                    <button type="submit">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<h1 style="text-align: center">Inventory</h1>
+<div class="container1">
+
+            {{range $a,$b :=.Items}}
+
+            {{if eq $a 0}}
+    <h4 style="color: #4d4d4d">You still don't have any rewards</h4>
+            {{else}}
+    <div class="card3">
+            <td>{{$a}}</td>
+            <td>{{$b.ItemName}}</td>
+            <td>{{$b.Type}}</td>
+            <td>{{$b.Stars}}</td>
+            <td><img src="/images/{{$b.ID}}" alt="My Image" width="200px"></td>
+            </div>
+            {{end}}
+            {{end}}
+</div>
+
+</body>
+</html>

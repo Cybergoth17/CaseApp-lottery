@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>main page</title>
+</head>
+<style>
+    @font-face {
+        font-family: 'MyCustomFont'; /* Choose a name for your font family */
+        src: url("../cmd/zh-cn.ttf"); /* Replace 'path/to/your/font/file.ttf' with the path to your font file */
+    }
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'MyCustomFont', sans-serif;
+    }
+    section{
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        padding: 100px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+    }
+    header{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px 100px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    header ul{
+        position: relative;
+        display: flex;
+    }
+    header ul li{
+        list-style: none;
+    }
+    header ul li a{
+        display: inline-block;
+        color: #333;
+        font-weight: 400;
+        margin-left: 40px;
+        text-decoration: none;
+    }
+    .content{
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.5s;
+    }
+    .content .textBox{
+        position: relative;
+        max-width: 600px;
+    }
+
+    .content .imgBox{
+        width: 300px;
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 50px;
+        margin-top: 50px;
+        transition: 0.5s;
+    }
+    .content .imgBox{
+        max-width: 500px;
+        transition: 0.5s;
+    }
+    .circle{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #aa7eee;
+        clip-path: circle(600px at left 800px);
+    }
+    .screen-1 {
+        background: #f1f7fe;
+        padding: 2em;
+        display: flex;
+        flex-direction: column;
+        border-radius: 30px;
+        box-shadow: 0 0 2em #e6e9f9;
+        gap: 2em;
+        width: 500px;
+    }
+    .screen-1 .email {
+        background: white;
+        box-shadow: 0 0 2em #e6e9f9;
+        padding: 0.8em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        border-radius: 20px;
+        color: #4d4d4d;
+        margin-top: -0.5em;
+    }
+    .screen-1 .email input {
+        outline: none;
+        border: none;
+    }
+    .screen-1 .password {
+        background: white;
+        box-shadow: 0 0 2em #e6e9f9;
+        padding: 0.8em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        border-radius: 20px;
+        color: #4d4d4d;
+    }
+    .screen-1 .password input {
+        outline: none;
+        border: none;
+    }
+    .screen-1 .password .show-hide {
+        margin-right: -5em;
+    }
+    .screen-1 .login {
+        padding: 1em;
+        background: #aa7eee;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-weight: 600;
+    }
+    .screen-1 .footer {
+        font-size: 0.7em;
+        color: #5e5e5e;
+        gap: 14em;
+        padding-bottom: 10em;
+    }
+    .screen-1 .footer span {
+        cursor: pointer;
+    }
+    button {
+        cursor: pointer;
+    }
+    .content .textBox span{
+        color: #aa7eee;
+        font-size: 1.2em;
+        font-weight: 900;
+    }
+</style>
+<body>
+<section>
+    <div class="circle"></div>
+    <header>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/store">Shop</a></li>
+            <li><a href="/login" style="color: #aa7eee;">Login</a></li>
+            <li><a href="/register" style="color: #aa7eee;">Register</a></li>
+        </ul>
+    </header>
+    <div class="content">
+        <div class="ImgBox">
+            <img style="margin-top: -50px;" width="500px" src="cmd/raiden.png" class="starbucks">
+        </div>
+        <div class="textBox">
+            <form method="post">
+                <div class="screen-1" style="height: 300px;">
+                    <center><span class="colortext">Register</span></center>
+                    <div class="email">
+                        Username
+                        <div class="sec-2">
+                            <ion-icon name="mail-outline"></ion-icon>
+                            <input type="text" name="username" placeholder="enter your username"/>
+                        </div>
+                    </div>
+                    <div class="email">
+                        Email Address
+                        <div class="sec-2">
+                            <ion-icon name="mail-outline"></ion-icon>
+                            <input type="email" name="email" placeholder="enter your email"/>
+                        </div>
+                    </div>
+                    <div class="password">
+                        <label>Password</label>
+                        <div class="sec-2">
+                            <ion-icon name="lock-closed-outline"></ion-icon>
+                            <input class="pas" type="password" name="password" placeholder="············"/>
+                            <ion-icon class="show-hide" name="eye-outline"></ion-icon>
+                        </div>
+                    </div>
+                    <button class="login" type="submit">Register </button>
+                    <div class="footer"><span><a href="/login" style="color: #aa7eee;text-decoration: none">Sign in</a></span>   &#160; </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+</body>
+</html>

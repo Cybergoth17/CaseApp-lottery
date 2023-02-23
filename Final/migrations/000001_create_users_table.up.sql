@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash bytea NOT NULL,
     activated bool NOT NULL,
     role text NOT NULL,
-    version integer NOT NULL DEFAULT 1
+    version integer NOT NULL DEFAULT 1,
+    balance integer NOT NULL DEFAULT 0
     );

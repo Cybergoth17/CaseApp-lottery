@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<section>
+<header>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/store">Shop</a></li>
+    <li><a href="/adminpage">Admin Page</a></li>
+    <li><a href="/profile" style="color: #aa7eee;">Profile</a></li>
+    <li><a href="/logout" style="color: #aa7eee;">Logout</a></li>
+  </ul>
+</header>
+
+<div class="content">
+  <center><h3>Cases</h3></center>
+  <table class="content-table">
+    <thead>
+    <tr style="background-color: #199c8b">
+      <th><center>Case ID</center></th>
+      <th>Case Name</th>
+      <th>Case Price</th>
+      <th>Items</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range $i,$k :=.}}
+    <tr>
+      <td>{{$k.ID}}</td>
+      <td>{{$k.Name}}</td>
+      <td>{{$k.Price}}</td>
+      {{range $a,$b :=$k.Items}}
+      <td>{{$b.ItemName}}
+     <img src="/images/{{$b.ID}}" alt="My Image" width="200px"></td>
+      {{end}}
+    </tr>
+    {{end}}
+    </tbody>
+  </table>
+</div>
+</section>
+<style>
+  *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'MyCustomFont', sans-serif;
+  }
+  section{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+  }
+  table, td, th {
+    border: 1px solid;
+    margin: 5px;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header .logo{
+    position: relative;
+    max-width: 80px;
+  }
+  header ul{
+    position: relative;
+    display: flex;
+  }
+  header ul li{
+    list-style: none;
+  }
+  header ul li a{
+    display: inline-block;
+    color: #333;
+    font-weight: 400;
+    margin-left: 40px;
+    text-decoration: none;
+  }
+</style>
+</body>
+</html>

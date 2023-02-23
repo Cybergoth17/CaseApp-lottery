@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+</head>
+<style>
+  @font-face {
+    font-family: 'MyCustomFont'; /* Choose a name for your font family */
+    src: url("../cmd/zh-cn.ttf"); /* Replace 'path/to/your/font/file.ttf' with the path to your font file */
+  }
+  *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'MyCustomFont', sans-serif;
+  }
+  section{
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+  }
+  header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header ul{
+    position: relative;
+    display: flex;
+  }
+  header ul li{
+    list-style: none;
+  }
+  header ul li a{
+    display: inline-block;
+    color: #333;
+    font-weight: 400;
+    margin-left: 40px;
+    text-decoration: none;
+  }
+  .content{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.5s;
+  }
+  .content .textBox{
+    position: relative;
+    max-width: 600px;
+  }
+
+  .content .imgBox{
+    width: 300px;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 50px;
+    margin-top: 50px;
+    transition: 0.5s;
+  }
+  .content .imgBox{
+    max-width: 500px;
+    transition: 0.5s;
+  }
+  .circle{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #aa7eee;
+    clip-path: circle(600px at left 800px);
+  }
+  button {
+    background-color: #9654d9;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  .content .textBox span{
+    color: #aa7eee;
+    font-size: 1.2em;
+    font-weight: 900;
+  }
+  a{
+    text-decoration: none;
+    color: white;
+  }
+
+</style>
+<body>
+<section>
+  <header>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/store">Shop</a></li>
+      <li><a href="/profile" style="color: #aa7eee;">Profile</a></li>
+      <li><a href="/logout" style="color: #aa7eee;">Logout</a></li>
+    </ul>
+  </header>
+  <div class="content">
+    <div class="ImgBox">
+      <img style="margin-top: -50px;" width="500px" src="cmd/raiden.png" class="starbucks">
+    </div>
+    <div class="textBox">
+      <h2>Welcome to admin page</h2>
+      <br>
+      <p>(you can manage resources)</p>
+      <br>
+      <button><a href="/admin">add item case</a></button> <br>
+      <button><a href="/caseadd">add case</a></button> <br>
+      <button> <a href="/list">list all items</a></button> <br>
+      <button><a href="/case">list all cases</a></button>
+    </div>
+
+  </div>
+</section>
+</body>
+</html>

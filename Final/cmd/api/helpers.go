@@ -2,13 +2,17 @@ package main
 
 import (
 	"Final/internal/validator"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"image"
+	"image/jpeg"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -152,4 +156,24 @@ func (app *application) background(fn func()) {
 		}()
 		fn()
 	}()
+}
+func loadImage(filename string) ([]byte, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := new(bytes.Buffer)
+	err = jpeg.Encode(buf, img, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }

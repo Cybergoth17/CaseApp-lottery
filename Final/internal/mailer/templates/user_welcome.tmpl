@@ -19,16 +19,15 @@ The Greenlight Team
 </head>
 <body>
 <p>Hi,</p>
-<p>Thanks for signing up for a Greenlight account. We're excited to have you on board!</p>
-<p>For future reference, your user ID number is {{.userID}}.</p>
-<p>Please send a request to the <code>PUT /v1/users/activated</code> endpoint with the
-following JSON body to activate your account:</p>
+<p>Thanks for signing up for a Adventurers Archive account. We're excited to have you on board!</p>
 <pre><code>
-{"token": "{{.activationToken}}"}
+<form method="post">
+<button style="background-color:#40867d;border: none;color: white;padding: 15px 32px;text-align: center;text-decoration: none;display: inline-block;font-size: 16px;margin: 4px 2px;cursor: pointer;border-radius: 10px;"><a href="http://127.0.0.1:4000/v1/users/activated?token={{.activationToken}}">confirm email</a></button>
+</form>
 </code></pre>
 <p>Please note that this is a one-time use token and it will expire in 3 days.</p>
 <p>Thanks,</p>
-<p>The Greenlight Team</p>
+<p>The Scam Team</p>
 </body>
 </html>
 {{end}}

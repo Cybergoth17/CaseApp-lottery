@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<style>
+  .box {
+    width: 300px; /* set the width of the box */
+    height: 200px; /* set the height of the box */
+    margin: auto; /* center the box horizontally */
+    position: absolute; /* position the box */
+    top: 0; bottom: 0; left: 0; right: 0; /* center the box vertically */
+    box-sizing: border-box; /* include padding in the width calculation */
+  }
+  header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header ul{
+    position: relative;
+    display: flex;
+  }
+  header ul li{
+    list-style: none;
+  }
+  header ul li a{
+    display: inline-block;
+    color: #333;
+    font-weight: 400;
+    margin-left: 40px;
+    text-decoration: none;
+  }
+</style>
+<body>
+<header>
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Shop</a></li>
+    <li><a href="#" style="color: #9c1d1d;">Login</a></li>
+    <li><a href="#" style="color: #9c1d1d;">Register</a></li>
+  </ul>
+</header>
+<div class="box">
+  <center>
+    <img width="200px" src="cmd/kkkk.png">
+    <h3> {{.}}</h3>
+  </center>
+</div>
+</body>
+</html>
